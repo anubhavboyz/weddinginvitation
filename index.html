@@ -11,6 +11,40 @@
             box-sizing: border-box;
         }
 
+        /* Music Control Button */
+        .music-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 10000;
+            background: linear-gradient(135deg, #FF6B6B, #FFD700);
+            border: 3px solid white;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            font-size: 30px;
+        }
+
+        .music-control:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 35px rgba(0,0,0,0.4);
+        }
+
+        .music-control.playing {
+            animation: musicPulse 1s infinite;
+        }
+
+        @keyframes musicPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
         body {
             font-family: 'Georgia', serif;
             overflow-x: hidden;
@@ -178,16 +212,32 @@
             animation: pulse 2s infinite;
             z-index: 10000;
             font-family: 'Georgia', serif;
+            white-space: nowrap;
         }
 
         @keyframes pulse {
             0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
         }
 
         .open-button:hover {
             background: linear-gradient(135deg, #FFA500, #FFD700);
             box-shadow: 0 15px 40px rgba(255, 215, 0, 0.7);
+        }
+
+        @media (max-width: 768px) {
+            .open-button {
+                padding: 15px 30px;
+                font-size: 18px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            
+            @keyframes pulse {
+                0%, 100% { transform: translate(-50%, -50%) scale(1); }
+                50% { transform: translate(-50%, -50%) scale(1.05); }
+            }
         }
 
         /* Main Content */
@@ -316,6 +366,7 @@
 
         .person {
             text-align: center;
+            flex-shrink: 0;
         }
 
         .person-icon {
@@ -350,12 +401,44 @@
         .heart {
             font-size: 50px;
             animation: heartbeat 1.5s infinite;
+            flex-shrink: 0;
         }
 
         @keyframes heartbeat {
             0%, 100% { transform: scale(1); }
             25% { transform: scale(1.2); }
             50% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .bride-groom {
+                gap: 15px;
+                margin: 20px 0;
+            }
+            
+            .person-icon {
+                font-size: 60px;
+            }
+            
+            .bride-icon::after {
+                font-size: 22px;
+                bottom: -8px;
+                right: -12px;
+            }
+            
+            .groom-icon::after {
+                font-size: 18px;
+                bottom: -5px;
+                right: -8px;
+            }
+            
+            .person h2 {
+                font-size: 24px;
+            }
+            
+            .heart {
+                font-size: 35px;
+            }
         }
 
         /* Events Section */
@@ -527,13 +610,58 @@
         /* Responsive */
         @media (max-width: 768px) {
             .header h1 { font-size: 36px; }
-            .person h2 { font-size: 28px; }
+            .ganesh { font-size: 36px; }
             .event-title { font-size: 32px; }
+            .event-icon { font-size: 45px; }
+            .event-info { font-size: 20px; }
             .venue h2 { font-size: 36px; }
+            .venue-info { font-size: 22px; }
+            .map-button { 
+                padding: 15px 35px; 
+                font-size: 20px; 
+            }
+            .event-card {
+                padding: 25px;
+                margin: 25px 10px;
+            }
+            .music-control {
+                width: 60px;
+                height: 60px;
+                font-size: 25px;
+                bottom: 20px;
+                right: 20px;
+            }
+            .footer {
+                font-size: 18px;
+            }
+            .footer-icon {
+                font-size: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 { font-size: 28px; }
+            .ganesh { font-size: 30px; }
+            .event-title { font-size: 26px; }
+            .event-icon { font-size: 38px; }
+            .venue h2 { font-size: 30px; }
         }
     </style>
 </head>
 <body>
+    <!-- Background Music - Sajeya Song -->
+    <audio id="bgMusic" loop>
+        <!-- Primary source - Sajeya from streaming service -->
+        <source src="./sajeya.mp3" type="audio/mpeg">
+        <!-- Fallback to YouTube embed won't work for audio tag, so using free wedding music -->
+        <source src="https://cdn.pixabay.com/audio/2022/03/10/audio_4f888a0524.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- Music Control Button -->
+    <div class="music-control" id="musicControl" title="संगीत चालू/बंद करें">
+        🔇
+    </div>
+
     <!-- Curtain -->
     <div class="curtain-container active" id="curtainContainer">
         <div class="curtain-top">
@@ -689,6 +817,37 @@
     </div>
 
     <script>
+        // Music Control
+        const bgMusic = document.getElementById('bgMusic');
+        const musicControl = document.getElementById('musicControl');
+        let isPlaying = false;
+
+        musicControl.addEventListener('click', function() {
+            if (isPlaying) {
+                bgMusic.pause();
+                musicControl.textContent = '🔇';
+                musicControl.classList.remove('playing');
+                isPlaying = false;
+            } else {
+                bgMusic.play().catch(e => console.log('Audio play failed:', e));
+                musicControl.textContent = '🔊';
+                musicControl.classList.add('playing');
+                isPlaying = true;
+            }
+        });
+
+        // Auto-play attempt when curtain opens
+        function tryAutoPlay() {
+            bgMusic.play().then(() => {
+                musicControl.textContent = '🔊';
+                musicControl.classList.add('playing');
+                isPlaying = true;
+            }).catch(() => {
+                // Auto-play blocked, user needs to click
+                console.log('Auto-play blocked. Click the music button to play.');
+            });
+        }
+
         // Curtain opening
         document.getElementById('openButton').addEventListener('click', function() {
             const curtain = document.getElementById('curtainContainer');
@@ -699,6 +858,7 @@
             setTimeout(() => {
                 curtain.style.display = 'none';
                 mainContent.classList.add('visible');
+                tryAutoPlay(); // Try to play music when curtain opens
             }, 2000);
         });
 
