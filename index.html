@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rishu & Shubham - Wedding Invitation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            overflow-x: hidden;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 107, 107, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 182, 193, 0.2) 0%, transparent 70%),
+                linear-gradient(135deg, #FFE5E5 0%, #FFF4E0 25%, #FFE0F0 50%, #FFF0E5 75%, #FFE5F5 100%);
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 20 L55 35 L70 35 L58 45 L62 60 L50 50 L38 60 L42 45 L30 35 L45 35 Z' fill='%23FFD700' opacity='0.1'/%3E%3C/svg%3E");
+            background-size: 150px 150px;
+            opacity: 0.4;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '🕉️';
+            position: fixed;
+            font-size: 300px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.03;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Curtain Animation */
+        .curtain-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 9999;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .curtain-container.active {
+            pointer-events: all;
+        }
+
+        .curtain {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    #8B0000 0px,
+                    #DC143C 40px,
+                    #8B0000 80px
+                ),
+                linear-gradient(180deg, #6B0000 0%, #DC143C 50%, #6B0000 100%);
+            transition: transform 2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .curtain-left {
+            left: 0;
+            border-right: 5px solid #FFD700;
+        }
+
+        .curtain-right {
+            right: 0;
+            border-left: 5px solid #FFD700;
+        }
+
+        .curtain::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent 0px,
+                rgba(0,0,0,0.3) 20px,
+                transparent 40px,
+                rgba(255,255,255,0.1) 60px,
+                transparent 80px
+            );
+        }
+
+        /* Curtain Top Design */
+        .curtain-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+            border-bottom: 3px solid #8B4513;
+            z-index: 10001;
+            transition: opacity 2s;
+        }
+
+        .curtain-top::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent 0px,
+                transparent 40px,
+                #FFD700 40px,
+                #FFD700 50px,
+                transparent 50px,
+                transparent 90px
+            );
+        }
+
+        .curtain-decoration {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            z-index: 10002;
+        }
+
+        .curtain-container.opened .curtain-top {
+            opacity: 0;
+        }
+
+        .curtain-container.opened .curtain-left {
+            transform: translateX(-100%);
+        }
+
+        .curtain-container.opened .curtain-right {
+            transform: translateX(100%);
+        }
+
+        .open-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 50px;
+            font-size: 24px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #8B0000;
+            border: 3px solid #FFD700;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+            animation: pulse 2s infinite;
+            z-index: 10000;
+            font-family: 'Georgia', serif;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .open-button:hover {
+            background: linear-gradient(135deg, #FFA500, #FFD700);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.7);
+        }
+
+        /* Main Content */
+        .main-content {
+            opacity: 0;
+            transition: opacity 1s ease-in;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content.visible {
+            opacity: 1;
+        }
+
+        /* Decorative Corner Elements */
+        .corner-decoration {
+            position: fixed;
+            font-size: 60px;
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .corner-tl {
+            top: 20px;
+            left: 20px;
+            animation: rotate 20s linear infinite;
+        }
+
+        .corner-tr {
+            top: 20px;
+            right: 20px;
+            animation: rotate 20s linear infinite reverse;
+        }
+
+        .corner-bl {
+            bottom: 20px;
+            left: 20px;
+            animation: rotate 20s linear infinite;
+        }
+
+        .corner-br {
+            bottom: 20px;
+            right: 20px;
+            animation: rotate 20s linear infinite reverse;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            padding: 60px 20px;
+            background: 
+                linear-gradient(135deg, rgba(255, 107, 107, 0.9) 0%, rgba(255, 193, 7, 0.9) 100%);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle, transparent 20%, rgba(255,255,255,0.1) 20%, rgba(255,255,255,0.1) 21%, transparent 21%),
+                radial-gradient(circle, transparent 20%, rgba(255,255,255,0.1) 20%, rgba(255,255,255,0.1) 21%, transparent 21%);
+            background-size: 80px 80px;
+            background-position: 0 0, 40px 40px;
+            animation: backgroundScroll 20s linear infinite;
+            opacity: 0.5;
+        }
+
+        .header::after {
+            content: '🌺';
+            position: absolute;
+            font-size: 120px;
+            top: 20px;
+            right: 20px;
+            opacity: 0.2;
+            animation: float 6s infinite;
+        }
+
+        @keyframes backgroundScroll {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .ganesh {
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700; }
+            50% { text-shadow: 0 0 20px #FFD700, 0 0 40px #FFD700; }
+        }
+
+        .header h1 {
+            font-size: 56px;
+            color: #8B0000;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .bride-groom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .person {
+            text-align: center;
+        }
+
+        .person-icon {
+            font-size: 80px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+            position: relative;
+            display: inline-block;
+        }
+
+        .bride-icon::after {
+            content: '💐';
+            position: absolute;
+            font-size: 30px;
+            bottom: -10px;
+            right: -15px;
+        }
+
+        .groom-icon::after {
+            content: '👔';
+            position: absolute;
+            font-size: 25px;
+            bottom: -5px;
+            right: -10px;
+        }
+
+        .person h2 {
+            font-size: 36px;
+            color: #2d3436;
+        }
+
+        .heart {
+            font-size: 50px;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1); }
+        }
+
+        /* Events Section */
+        .events {
+            padding: 60px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            margin: 40px 0;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.5s;
+            border: 5px solid;
+        }
+
+        .event-card.tilak { border-color: #FFD700; }
+        .event-card.haldi { border-color: #FFC300; }
+        .event-card.mehndi { border-color: #C70039; }
+        .event-card.wedding { border-color: #FF1744; }
+
+        .event-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .event-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .event-icon {
+            font-size: 60px;
+        }
+
+        .event-title {
+            font-size: 42px;
+            color: #2d3436;
+        }
+
+        .event-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+
+        .event-card.expanded .event-details {
+            max-height: 500px;
+        }
+
+        .event-info {
+            font-size: 24px;
+            color: #636e72;
+            margin: 15px 0;
+            line-height: 1.8;
+        }
+
+        .flower-border {
+            position: absolute;
+            font-size: 30px;
+            opacity: 0.3;
+        }
+
+        .top-left { top: 10px; left: 10px; }
+        .top-right { top: 10px; right: 10px; }
+        .bottom-left { bottom: 10px; left: 10px; }
+        .bottom-right { bottom: 10px; right: 10px; }
+
+        .tap-hint {
+            text-align: center;
+            font-size: 20px;
+            color: #636e72;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        /* Venue Section */
+        .venue {
+            background: 
+                linear-gradient(135deg, rgba(255, 107, 107, 0.95) 0%, rgba(255, 193, 7, 0.95) 100%);
+            padding: 60px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .venue::before {
+            content: '🏛️';
+            position: absolute;
+            font-size: 200px;
+            top: 50%;
+            left: 10%;
+            transform: translateY(-50%);
+            opacity: 0.1;
+        }
+
+        .venue::after {
+            content: '🗺️';
+            position: absolute;
+            font-size: 200px;
+            top: 50%;
+            right: 10%;
+            transform: translateY(-50%);
+            opacity: 0.1;
+        }
+
+        .venue h2 {
+            font-size: 48px;
+            color: #8B0000;
+            margin-bottom: 30px;
+        }
+
+        .venue-details {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            border: 5px solid #FFD700;
+        }
+
+        .venue-info {
+            font-size: 28px;
+            color: #2d3436;
+            margin: 20px 0;
+        }
+
+        .map-button {
+            display: inline-block;
+            padding: 20px 50px;
+            font-size: 24px;
+            background: linear-gradient(135deg, #FF6B6B, #FF1744);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.5);
+            transition: all 0.3s;
+        }
+
+        .map-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.7);
+        }
+
+        /* Footer */
+        .footer {
+            background: #2d3436;
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 24px;
+        }
+
+        .footer-icon {
+            font-size: 40px;
+            margin: 0 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 36px; }
+            .person h2 { font-size: 28px; }
+            .event-title { font-size: 32px; }
+            .venue h2 { font-size: 36px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Curtain -->
+    <div class="curtain-container active" id="curtainContainer">
+        <div class="curtain-top">
+            <div class="curtain-decoration">🌺 🕉️ 🌺</div>
+        </div>
+        <div class="curtain curtain-left"></div>
+        <div class="curtain curtain-right"></div>
+        <button class="open-button" id="openButton">✨ शुभ आरंभ ✨</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Corner Decorations -->
+        <div class="corner-decoration corner-tl">🌸</div>
+        <div class="corner-decoration corner-tr">🌺</div>
+        <div class="corner-decoration corner-bl">🌼</div>
+        <div class="corner-decoration corner-br">🌻</div>
+        
+        <!-- Header -->
+        <div class="header">
+            <div class="ganesh">🕉️ ॐ श्री गणेशाय नमः 🕉️</div>
+            <h1>💖 शुभ विवाह 💍</h1>
+            
+            <div class="bride-groom">
+                <div class="person">
+                    <div class="person-icon bride-icon">👰‍♀️</div>
+                    <h2>Rishu Kumari</h2>
+                </div>
+                
+                <div class="heart">💕</div>
+                
+                <div class="person">
+                    <div class="person-icon groom-icon">🤵‍♂️</div>
+                    <h2>Shubham Kumar</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events -->
+        <div class="events">
+            <!-- Tilak -->
+            <div class="event-card tilak" onclick="toggleEvent(this)">
+                <div class="flower-border top-left">🌺</div>
+                <div class="flower-border top-right">🌺</div>
+                <div class="flower-border bottom-left">🌸</div>
+                <div class="flower-border bottom-right">🌸</div>
+                
+                <div class="event-header">
+                    <div class="event-icon">✨</div>
+                    <div class="event-title">तिलक समारोह</div>
+                </div>
+                <div class="tap-hint">👆 विवरण के लिए क्लिक करें</div>
+                
+                <div class="event-details">
+                    <div class="event-info">📅 <strong>दिनांक:</strong> 06 फरवरी 2026</div>
+                    <div class="event-info">🎊 परिवारों का पवित्र मिलन</div>
+                    <div class="event-info">💛 वर पक्ष द्वारा वधू को तिलक</div>
+                    <div class="event-info">🙏 आशीर्वाद एवं शुभकामनाएं</div>
+                </div>
+            </div>
+
+            <!-- Haldi -->
+            <div class="event-card haldi" onclick="toggleEvent(this)">
+                <div class="flower-border top-left">🌼</div>
+                <div class="flower-border top-right">🌼</div>
+                <div class="flower-border bottom-left">🌻</div>
+                <div class="flower-border bottom-right">🌻</div>
+                
+                <div class="event-header">
+                    <div class="event-icon">💛</div>
+                    <div class="event-title">हल्दी रस्म</div>
+                </div>
+                <div class="tap-hint">👆 विवरण के लिए क्लिक करें</div>
+                
+                <div class="event-details">
+                    <div class="event-info">📅 <strong>दिनांक:</strong> 07 फरवरी 2026</div>
+                    <div class="event-info">⏰ <strong>समय:</strong> सुबह 11 बजे</div>
+                    <div class="event-info">✨ पारंपरिक हल्दी का उबटन</div>
+                    <div class="event-info">🎉 खुशियों और रंगों का त्योहार</div>
+                    <div class="event-info">👨‍👩‍👧‍👦 परिवार के साथ मस्ती</div>
+                </div>
+            </div>
+
+            <!-- Mehndi & Sangeet -->
+            <div class="event-card mehndi" onclick="toggleEvent(this)">
+                <div class="flower-border top-left">🌹</div>
+                <div class="flower-border top-right">🌹</div>
+                <div class="flower-border bottom-left">💐</div>
+                <div class="flower-border bottom-right">💐</div>
+                
+                <div class="event-header">
+                    <div class="event-icon">🎶</div>
+                    <div class="event-title">मेहंदी एवं संगीत</div>
+                </div>
+                <div class="tap-hint">👆 विवरण के लिए क्लिक करें</div>
+                
+                <div class="event-details">
+                    <div class="event-info">📅 <strong>दिनांक:</strong> 07 फरवरी 2026</div>
+                    <div class="event-info">⏰ <strong>समय:</strong> शाम 7 बजे</div>
+                    <div class="event-info">🎨 सुंदर मेहंदी डिज़ाइन</div>
+                    <div class="event-info">🎵 संगीत एवं नृत्य की रात</div>
+                    <div class="event-info">🕺💃 Party Hard! डांस करो मस्ती करो!</div>
+                </div>
+            </div>
+
+            <!-- Wedding -->
+            <div class="event-card wedding" onclick="toggleEvent(this)">
+                <div class="flower-border top-left">🏵️</div>
+                <div class="flower-border top-right">🏵️</div>
+                <div class="flower-border bottom-left">🌺</div>
+                <div class="flower-border bottom-right">🌺</div>
+                
+                <div class="event-header">
+                    <div class="event-icon">💍</div>
+                    <div class="event-title">शुभ विवाह</div>
+                </div>
+                <div class="tap-hint">👆 विवरण के लिए क्लिक करें</div>
+                
+                <div class="event-details">
+                    <div class="event-info">📅 <strong>दिनांक:</strong> 08 फरवरी 2026</div>
+                    <div class="event-info">🕉️ पवित्र विवाह संस्कार</div>
+                    <div class="event-info">💑 दो आत्माओं का पवित्र मिलन</div>
+                    <div class="event-info">🙏 सप्तपदी एवं मंगल फेरे</div>
+                    <div class="event-info">🎊 आपके आशीर्वाद की प्रतीक्षा</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Venue -->
+        <div class="venue">
+            <h2>📍 स्थान</h2>
+            <div class="venue-details">
+                <div class="venue-info">🏛️ <strong>Mandap Resort</strong></div>
+                <div class="venue-info">📍 Bailey Road, Patna</div>
+                <div class="venue-info">🗺️ आसानी से पहुंचने योग्य स्थान</div>
+                <a href="https://maps.app.goo.gl/cEnCXzkKrq1VLBwS9" target="_blank" class="map-button">
+                    🧭 गूगल मैप पर देखें
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>💕 प्यार के लिए आएं, vibes के लिए रुकें 🕺💃</p>
+            <p>✨ और Party Hard करें! ✨</p>
+            <p style="margin-top: 20px;">
+                <span class="footer-icon">🌸</span>
+                <span class="footer-icon">💖</span>
+                <span class="footer-icon">🎊</span>
+            </p>
+            <p style="margin-top: 20px; font-size: 20px;">वहां मिलते हैं! 🙏</p>
+        </div>
+    </div>
+
+    <script>
+        // Curtain opening
+        document.getElementById('openButton').addEventListener('click', function() {
+            const curtain = document.getElementById('curtainContainer');
+            const mainContent = document.getElementById('mainContent');
+            
+            curtain.classList.add('opened');
+            
+            setTimeout(() => {
+                curtain.style.display = 'none';
+                mainContent.classList.add('visible');
+            }, 2000);
+        });
+
+        // Event card expansion
+        function toggleEvent(card) {
+            card.classList.toggle('expanded');
+        }
+
+        // Add floating flowers animation
+        function createFloatingFlowers() {
+            const flowers = ['🌸', '🌺', '🌼', '🌻', '🌹', '💐'];
+            const body = document.body;
+            
+            setInterval(() => {
+                const flower = document.createElement('div');
+                flower.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+                flower.style.position = 'fixed';
+                flower.style.left = Math.random() * 100 + '%';
+                flower.style.top = '-50px';
+                flower.style.fontSize = '30px';
+                flower.style.opacity = '0.6';
+                flower.style.zIndex = '1';
+                flower.style.pointerEvents = 'none';
+                flower.style.transition = 'all 5s linear';
+                
+                body.appendChild(flower);
+                
+                setTimeout(() => {
+                    flower.style.top = '100vh';
+                    flower.style.transform = 'rotate(360deg)';
+                }, 100);
+                
+                setTimeout(() => {
+                    flower.remove();
+                }, 5000);
+            }, 3000);
+        }
+
+        // Start animations after curtain opens
+        setTimeout(() => {
+            createFloatingFlowers();
+        }, 2000);
+    </script>
+</body>
+</html>
